@@ -7,6 +7,7 @@ import {Button, Container, Form, Grid, Header, Radio, Segment} from 'semantic-ui
 import {Route} from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
 import Cookies from "universal-cookie";
+import {shuffle} from "../utils";
 
 
 export default class PollPage extends Component {
@@ -53,13 +54,16 @@ export default class PollPage extends Component {
         this.setState({answeredIds: (this.cookies.get('answeredIds') || '').split(':')});
         const id = queryString.parse(this.props.location.search).id;
         if (id !== undefined) {
-            getJson(id).then(json => this.setState({
-                title: json.title,
-                description: json.description,
-                fields: json.fields,
-                counts: json.counts,
-                id: id
-            }));
+            getJson(id).then(json => {
+                shuffle(json.fields);
+                this.setState({
+                    title: json.title,
+                    description: json.description,
+                    fields: json.fields,
+                    counts: json.counts,
+                    id: id
+                });
+            });
         }
     }
 
