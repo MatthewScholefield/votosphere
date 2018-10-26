@@ -15,7 +15,8 @@ export default class CreatePollPage extends Component {
         agreed: false,
         submitting: false,
         pollUrl: '',
-        loading: false
+        loading: false,
+        shuffle: false
     };
 
     render() {
@@ -35,6 +36,13 @@ export default class CreatePollPage extends Component {
                                                 label='Description' placeholder='Description...'/>
                                     <Form.Group inline>
                                         <label>Poll Options</label>
+                                    </Form.Group>
+                                    <Form.Group inline>
+                                        <Checkbox label='Shuffle'
+                                                  onChange={(event, data) => {
+                                                      this.setState({shuffle: data.checked})
+                                                  }}
+                                        />
                                     </Form.Group>
                                     {
                                         this.state.fieldNames.concat(['']).map((name, i) => (
@@ -78,7 +86,8 @@ export default class CreatePollPage extends Component {
                                                     title: this.state.title,
                                                     description: this.state.description,
                                                     fields: this.state.fieldNames,
-                                                    counts: countsId
+                                                    counts: countsId,
+                                                    shuffle: this.state.shuffle
                                                 })).then(id => {
                                                     history.push("/poll?id=" + id);
                                                 });

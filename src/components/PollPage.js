@@ -55,7 +55,9 @@ export default class PollPage extends Component {
         const id = queryString.parse(this.props.location.search).id;
         if (id !== undefined) {
             getJson(id).then(json => {
-                shuffle(json.fields);
+                if (json.shuffle) {
+                    shuffle(json.fields);
+                }
                 this.setState({
                     title: json.title,
                     description: json.description,
