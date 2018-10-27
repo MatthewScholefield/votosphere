@@ -8,12 +8,30 @@ import {Route} from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
 import Cookies from "universal-cookie";
 import {shuffle} from "../utils";
+import {Slider} from 'react-semantic-ui-range'
+
+
+class InputMeter extends Component {
+    render() {
+        return <Slider color="red" inverted={false}
+                       settings={{
+                           start: 0.5,
+                           min: 0,
+                           max: 1,
+                           step: 0.01,
+                           onChange: (value) => {
+                               this.props.onChange(value)
+                           }
+                       }} style={{marginBottom: 14}}/>;
+    }
+}
 
 
 export default class PollPage extends Component {
     state = {
         title: "",
         description: "",
+        extraDescriptions: {},
         fields: [],
         choices: {},
         counts: "",
@@ -26,13 +44,11 @@ export default class PollPage extends Component {
         this.cookies = new Cookies();
     }
 
-    handleRadioUpdate = (value, field, amount) => {
-        if (value !== undefined) {
-            this.setState(({choices}) => {
-                choices[field] = amount;
-                return {choices: choices};
-            })
-        }
+    handleRadioUpdate = (field, amount) => {
+        this.setState(({choices}) => {
+            choices[field] = amount;
+            return {choices: choices};
+        })
     };
 
     submitForm = (history) => {
@@ -61,6 +77,7 @@ export default class PollPage extends Component {
                 this.setState({
                     title: json.title,
                     description: json.description,
+                    extraDescriptions: json.extraDescriptions,
                     fields: json.fields,
                     counts: json.counts,
                     id: id
@@ -68,6 +85,23 @@ export default class PollPage extends Component {
             });
         }
     }
+
+    renderField = field => {
+        const selector = <InputMeter amount={this.state.choices[field] || 0.5}
+                                     onChange={val => this.handleRadioUpdate(field, val)}/>;
+        const desc = this.state.extraDescriptions[field];
+        if (desc) {
+            return [
+                <Form.Field><label style={{fontSize: '1.2rem'}}>{field}</label></Form.Field>,
+                <p><ReactMarkdown source={desc}/></p>,
+                selector
+            ];
+        } else {
+            return [<Form.Group inline key={field}>
+                <label>{field + ':'}</label>
+            </Form.Group>, selector]
+        }
+    };
 
     render() {
         if (this.state.id && this.state.answeredIds.includes(this.state.id)) {
@@ -92,22 +126,7 @@ export default class PollPage extends Component {
                                 <Form>
                                     {
                                         this.state.fields.map(field => (
-                                            <Form.Group inline key={field}>
-                                                <label>{field}</label>
-                                                {
-                                                    [...Array(3).keys()].map(amount => (
-                                                        <Form.Field
-                                                            key={amount}
-                                                            control={Radio}
-                                                            label={amount}
-                                                            value={amount}
-                                                            name={field}
-                                                            onChange={(e, {value}) => this.handleRadioUpdate(value, field, amount)}
-                                                            checked={this.state.choices[field] === amount}
-                                                        />
-                                                    ))
-                                                }
-                                            </Form.Group>
+                                            this.renderField(field)
                                         ))
                                     }
                                     <Route render={({history}) => (

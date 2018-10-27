@@ -8005,6 +8005,11 @@ react-scripts@2.0.4:
   optionalDependencies:
     fsevents "1.2.4"
 
+react-semantic-ui-range@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/react-semantic-ui-range/-/react-semantic-ui-range-0.6.2.tgz#5573c602616d5fe4a6134c07bfc78a60805cf18b"
+  integrity sha512-l6eEV9jjwVT2tHf451a1wfVJC7PHRq3qMVFCSEvdzvJuaaR18K+F3aEs9xa8bHOUetRluG7rIRNZVvuxVRgA9Q==
+
 react@^16.5.2:
   version "16.5.2"
   resolved "https://registry.yarnpkg.com/react/-/react-16.5.2.tgz#19f6b444ed139baa45609eee6dc3d318b3895d42"
