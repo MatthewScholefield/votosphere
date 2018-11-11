@@ -54,10 +54,15 @@ export default class PollPage extends Component {
     submitForm = (history) => {
         const choices = this.state.choices;
         getJson(this.state.counts).then(
-            data => updateJson(this.state.counts, {
-                counts: Object.assign({}, ...Object.keys(choices).map(k => ({[k]: data.counts[k] + choices[k]}))),
-                numResponses: data.numResponses + 1
-            })
+            data => {
+                const newData = {
+                    counts: Object.assign({}, ...Object.keys(choices).map(k => ({[k]: data.counts[k] + choices[k]}))),
+                    numResponses: data.numResponses + 1
+                };
+                if (newData.counts !== undefined && newData.counts.length > 0) {
+                    updateJson(this.state.counts, newData);
+                }
+            }
         ).then(r => {
             const answeredIds = this.state.answeredIds;
             answeredIds.push(this.state.id);
