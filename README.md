@@ -8,12 +8,11 @@ the description field uses markdown so that it can have more advanced
 formatting.
 
 The app does not consist of a backend but rather relies exclusively on
-[myjson](http://myjson.com/) as a json store. For this reason along with
-the app's MVP design, do not create polls with sensitive data or that
-require a high level of accuracy.
+[Blobse](https://github.com/MatthewScholefield/blobse) as a json store.
+For this reason along with the app's MVP design, do not create polls
+with sensitive data or that require a high level of accuracy.
 
 # Contributing
 
 If you think of a suggestion or find a bug, feel free to create an issue
 or pull request.
-
