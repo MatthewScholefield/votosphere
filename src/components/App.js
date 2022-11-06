@@ -1,34 +1,34 @@
-import React, {Component} from 'react';
+import React from 'react';
 import './App.css';
 import 'semantic-ui-css/semantic.min.css';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import {HashRouter, Route} from "react-router-dom";
+import {HashRouter, Route, Routes} from "react-router-dom";
 import IntroPage from "./IntroPage";
 import CreatePollPage from './CreatePollPage';
 import PollPage from './PollPage';
 import ViewPollPage from './ViewPollPage';
 
 
-export default class App extends Component {
-    render() {
-        return (
-            <HashRouter>
-                <div className="App Site">
-                    <div className="Site-content">
-                        <div className="App-header">
-                            <Navbar key='navbar'/>
-                        </div>
-                        <div className="main">
-                            <Route key={1} exact path="/" component={IntroPage}/>
-                            <Route key={2} exact path="/createPoll" component={CreatePollPage}/>
-                            <Route key={3} exact path="/poll" component={PollPage}/>
-                            <Route key={4} exact path="/viewPoll" component={ViewPollPage}/>
-                        </div>
+export default function App() {
+    return (
+        <HashRouter>
+            <div className="App Site">
+                <div className="Site-content">
+                    <div className="App-header">
+                        <Navbar key='navbar'/>
                     </div>
-                    <Footer key='footer'/>
+                    <div className="main">
+                        <Routes>
+                            <Route key={1} exact path="/" element={<IntroPage/>}/>
+                            <Route key={2} exact path="/createPoll" element={<CreatePollPage/>}/>
+                            <Route key={3} exact path="/poll" element={<PollPage/>}/>
+                            <Route key={4} exact path="/viewPoll" element={<ViewPollPage/>}/>
+                        </Routes>
+                    </div>
                 </div>
-            </HashRouter>
-        );
-    }
+                <Footer key='footer'/>
+            </div>
+        </HashRouter>
+    );
 }

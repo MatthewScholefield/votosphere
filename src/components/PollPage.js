@@ -1,153 +1,134 @@
-import React, {Component} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import queryString from "query-string";
 import './App.css';
 import {getJson, updateJson} from '../api';
 import 'semantic-ui-css/semantic.min.css';
-import {Button, Container, Form, Grid, Header, Radio, Segment} from 'semantic-ui-react';
-import {Route} from "react-router-dom";
+import {Button, Container, Form, Grid, Header, Popup, Segment} from 'semantic-ui-react';
+import {useLocation, useNavigate} from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
 import Cookies from "universal-cookie";
 import {shuffle} from "../utils";
 import {Slider} from 'react-semantic-ui-range'
 
 
-class InputMeter extends Component {
-    render() {
-        return <Slider color="red" inverted={false}
-                       settings={{
-                           start: 0.5,
-                           min: 0,
-                           max: 1,
-                           step: 0.01,
-                           onChange: (value) => {
-                               this.props.onChange(value)
-                           }
-                       }} style={{marginBottom: 14}}/>;
-    }
+function InputMeter({value, onChange}) {
+    return <Slider
+        color="red"
+        inverted={false}
+        value={value}
+        settings={{
+            start: 0.5,
+            min: 0,
+            max: 1,
+            step: 0.01,
+            onChange
+        }}
+        style={{marginBottom: 14}}
+    />;
 }
 
 
-export default class PollPage extends Component {
-    state = {
-        title: "",
-        description: "",
-        extraDescriptions: {},
-        fields: [],
-        choices: {},
-        counts: "",
-        id: "",
-        answeredIds: []
-    };
+let cookies = new Cookies();
 
-    constructor(props) {
-        super(props);
-        this.cookies = new Cookies();
-    }
+export default function PollPage() {
+    const navigate = useNavigate();
+    const [poll, setPoll] = useState({});
+    const [id, setId] = useState("");
+    const [choices, setChoices] = useState({});
+    const [answeredIds, setAnsweredIds] = useState((cookies.get('answeredIds') || '').split(':'));
+    const location = useLocation();
 
-    handleRadioUpdate = (field, amount) => {
-        this.setState(({choices}) => {
-            choices[field] = amount;
-            return {choices: choices};
-        })
-    };
-
-    submitForm = (history) => {
-        const choices = this.state.choices;
-        getJson(this.state.counts).then(
-            data => {
-                const newData = {
-                    counts: Object.assign({}, ...Object.keys(choices).map(k => ({[k]: data.counts[k] + choices[k]}))),
-                    numResponses: data.numResponses + 1
-                };
-                if (newData.counts !== undefined && newData.counts.length > 0) {
-                    updateJson(this.state.counts, newData);
-                }
-            }
-        ).then(r => {
-            const answeredIds = this.state.answeredIds;
-            answeredIds.push(this.state.id);
-            this.cookies.set('answeredIds', answeredIds.join(':'), {expires: new Date(2145916800000)})
-            history.push("/viewPoll?id=" + this.state.id);
-        });
-    };
-
-    componentWillMount() {
-        this.setState({answeredIds: (this.cookies.get('answeredIds') || '').split(':')});
-        const id = queryString.parse(this.props.location.search).id;
-        if (id !== undefined) {
-            getJson(id).then(json => {
+    useEffect(() => {
+        const idFromUrl = queryString.parse(location.search).id;
+        if (idFromUrl !== undefined) {
+            getJson(idFromUrl).then(json => {
                 if (json.shuffle) {
                     shuffle(json.fields);
                 }
-                this.setState({
+                setPoll({
                     title: json.title,
                     description: json.description,
                     extraDescriptions: json.extraDescriptions,
                     fields: json.fields,
                     counts: json.counts,
-                    id: id
                 });
+                setId(idFromUrl);
             });
         }
+    }, [location.search])
+
+    const submitForm = useCallback(() => {
+        getJson(poll.counts).then(
+            data => {
+                const newData = {
+                    counts: Object.assign({}, ...Object.keys(choices).map(k => ({[k]: data.counts[k] + choices[k]}))),
+                    numResponses: data.numResponses + 1
+                };
+                if (newData.counts !== undefined && Object.keys(newData.counts).length > 0) {
+                    updateJson(poll.counts, newData);
+                }
+            }
+        ).then(r => {
+            const newAnsweredIds = [...answeredIds, id];
+            setAnsweredIds(newAnsweredIds);
+            cookies.set('answeredIds', newAnsweredIds.join(':'), {expires: new Date(2145916800000)})
+            navigate("/viewPoll?id=" + id);
+        });
+    }, [answeredIds, id, poll.counts, choices, navigate]);
+    if (id && answeredIds.includes(id)) {
+        navigate("/viewPoll?id=" + id);
+        return <div/>;
     }
-
-    renderField = field => {
-        const selector = <InputMeter amount={this.state.choices[field] || 0.5}
-                                     onChange={val => this.handleRadioUpdate(field, val)}/>;
-        const desc = this.state.extraDescriptions[field];
-        if (desc) {
-            return [
-                <Form.Field><label style={{fontSize: '1.2rem'}}>{field}</label></Form.Field>,
-                <p><ReactMarkdown source={desc}/></p>,
-                selector
-            ];
-        } else {
-            return [<Form.Group inline key={field}>
-                <label>{field + ':'}</label>
-            </Form.Group>, selector]
-        }
-    };
-
-    render() {
-        if (this.state.id && this.state.answeredIds.includes(this.state.id)) {
-            return <Route render={({history}) => {
-                history.push("/viewPoll?id=" + this.state.id);
-                return <div/>;
-            }}/>
-        }
-        return (
-            <Container>
-                <div style={{height: 40}}/>
-                <Header>{this.state.title || "Respond to Poll"}</Header>
-                <div style={{listStylePosition: 'inside'}}>
-                    <ReactMarkdown source={this.state.description || "Respond to a Poll from a link"}/>
-                </div>
-                <div style={{height: 20}}/>
-                <Grid centered>
-                    <Grid.Row>
-                        <Grid.Column computer={6} tablet={12} mobile={16}>
-
-                            <Segment fluid raised style={{padding: 20}}>
-                                <Form>
-                                    {
-                                        this.state.fields.map(field => (
-                                            this.renderField(field)
-                                        ))
-                                    }
-                                    <Route render={({history}) => (
-                                        <Form.Field control={Button}
-                                                    onClick={() => this.submitForm(history)}
-                                                    disabled={Object.keys(this.state.choices).length !== this.state.fields.length}
+    const canSubmit = Object.keys(choices).length === (poll.fields ?? []).length;
+    return (
+        <Container>
+            <div style={{height: 40}}/>
+            <Header>{poll.title || "Respond to Poll"}</Header>
+            <div style={{listStylePosition: 'inside'}}>
+                <ReactMarkdown>{poll.description || "Respond to a Poll from a link"}</ReactMarkdown>
+            </div>
+            <div style={{height: 20}}/>
+            <Grid centered>
+                <Grid.Row>
+                    <Grid.Column computer={6} tablet={12} mobile={16}>
+                        <Segment raised style={{padding: 20}}>
+                            <Form>
+                                {
+                                    (poll.fields ?? []).map(field => {
+                                        const selector = <InputMeter key={`select-${field}`} value={choices[field] || 0.5}
+                                                                     onChange={val => setChoices({...choices, [field]: val})}/>;
+                                        const desc = poll.extraDescriptions[field];
+                                        if (desc) {
+                                            return <div key={field}>
+                                                <Form.Field key={`label-${field}`}><label style={{fontSize: '1.2rem'}}>{field}</label></Form.Field>
+                                                <p key={`desc-${field}`}><ReactMarkdown>{desc}</ReactMarkdown></p>
+                                                {selector}
+                                            </div>;
+                                        } else {
+                                            return <div key={field}>
+                                                <Form.Group key={`label-${field}`} inline>
+                                                    <label>{field + ':'}</label>
+                                                </Form.Group>
+                                                {selector}
+                                            </div>
+                                        }
+                                    })
+                                }
+                                <Popup trigger={
+                                    <div style={{width: '100px'}}>
+                                        <Form.Field key={`continue`} control={Button}
+                                                    onClick={submitForm}
+                                                    disabled={!canSubmit}
                                         >
                                             Continue
                                         </Form.Field>
-                                    )}/>
-                                </Form>
-                            </Segment>
-                        </Grid.Column>
-                    </Grid.Row>
-                </Grid>
-            </Container>
-        );
-    }
+                                    </div>
+                                } content={`You have not scored the following options: ${(poll.fields || []).filter(x => !Object.hasOwn(choices, x)).join(", ")}`} disabled={canSubmit}/>
+                            </Form>
+                        </Segment>
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
+        </Container>
+    );
 }
