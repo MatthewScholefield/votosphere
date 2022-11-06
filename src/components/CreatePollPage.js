@@ -27,7 +27,6 @@ export default function CreatePollPage() {
     const [shuffle, setShuffle] = useState(false);
     const [isExtraDescOpen, setIsExtraDescOpen] = useState({});
     const [extraDesc, setExtraDesc] = useState({});
-    console.log('VALZ:', !agreed, loading, title.length <= 0, fieldNames.length <= 0)
     return (
         <Container>
             <div style={{height: 40}}/>
