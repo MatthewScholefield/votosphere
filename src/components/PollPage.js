@@ -95,7 +95,7 @@ export default function PollPage() {
                             <Form>
                                 {
                                     (poll.fields ?? []).map(field => {
-                                        const selector = <InputMeter key={`select-${field}`} value={choices[field] || 0.5}
+                                        const selector = <InputMeter key={`select-${field}`} value={choices[field] ?? 0.5}
                                                                      onChange={val => setChoices({...choices, [field]: val})}/>;
                                         const desc = poll.extraDescriptions[field];
                                         if (desc) {
