@@ -49,11 +49,7 @@ export default function ViewPollPage() {
                 setId("");
                 setBadId(true);
             }
-            setPollInfo({
-                title: json.title,
-                description: json.description,
-                fields: json.fields,
-            });
+            setPollInfo(json);
             return getJson(json.counts);
         }).then(data => {
             setCountsData(data);
@@ -73,12 +69,17 @@ export default function ViewPollPage() {
     ];  // 'red', 'green' Too misleading
 
     const pollView = <>
+        
         {(pollInfo.fields ?? []).map((field, i) => {
-            return <Progress progress='value' key={field}
-                            value={counts[field] || 0} total={maxCount}
-                            color={colors[i % colors.length]}>{field}{(pollInfo.extraDescriptions ?? {})[field] ?
-                                <><br/><ReactMarkdown>{pollInfo.extraDescriptions[field]}</ReactMarkdown></> : <></>
-                            }</Progress>
+            return <>
+                <div style={{margin: '0 0 0.5em'}}>
+                    <label style={{fontSize: '1.1rem', fontWeight: 700}}>{field}</label>
+                </div>
+                <ReactMarkdown>{pollInfo.extraDescriptions[field]}</ReactMarkdown>
+                <Progress progress='value' key={field} style={{margin: '0.5em 0 1.5em'}}
+                                value={counts[field] || 0} total={maxCount}
+                                color={colors[i % colors.length]}/>
+            </>
         })}
         <Button onClick={() => setUpdatedAt(new Date().getTime())} icon labelPosition='right'
                 disabled={loading}>
