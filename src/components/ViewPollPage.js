@@ -76,7 +76,9 @@ export default function ViewPollPage() {
         {(pollInfo.fields ?? []).map((field, i) => {
             return <Progress progress='value' key={field}
                             value={counts[field] || 0} total={maxCount}
-                            color={colors[i % colors.length]}>{field}</Progress>
+                            color={colors[i % colors.length]}>{field}{pollInfo.extraDescriptions[field] ?
+                                <><br/><ReactMarkdown>{pollInfo.extraDescriptions[field]}</ReactMarkdown></> : <></>
+                            }</Progress>
         })}
         <Button onClick={() => setUpdatedAt(new Date().getTime())} icon labelPosition='right'
                 disabled={loading}>
