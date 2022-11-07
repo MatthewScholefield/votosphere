@@ -13,7 +13,7 @@ function Social({name, href}) {
 
 export default function Footer() {
     return <>
-        <div style={{height: 40}}/>,
+        <div style={{height: 40}}/>
         <Menu attached='bottom' style={{backgroundColor: '#F5F5F5'}}>
             <Container style={{alignContent: 'center', textAlign: 'center'}}>
                 <Grid centered stackable style={{padding: 40}}>
