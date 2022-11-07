@@ -69,17 +69,16 @@ export default function ViewPollPage() {
     ];  // 'red', 'green' Too misleading
 
     const pollView = <>
-        
         {(pollInfo.fields ?? []).map((field, i) => {
-            return <>
+            return <div key={field}>
                 <div style={{margin: '0 0 0.5em'}}>
                     <label style={{fontSize: '1.1rem', fontWeight: 700}}>{field}</label>
                 </div>
                 <ReactMarkdown>{pollInfo.extraDescriptions[field]}</ReactMarkdown>
-                <Progress progress='value' key={field} style={{margin: '0.5em 0 1.5em'}}
+                <Progress progress='value' style={{margin: '0.5em 0 1.5em'}}
                                 value={(counts[field] || 0).toFixed(2)} total={maxCount}
                                 color={colors[i % colors.length]}/>
-            </>
+            </div>
         })}
         <Button onClick={() => setUpdatedAt(new Date().getTime())} icon labelPosition='right'
                 disabled={loading}>
