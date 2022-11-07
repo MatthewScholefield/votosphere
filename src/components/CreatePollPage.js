@@ -34,7 +34,7 @@ export default function CreatePollPage() {
             <Grid centered>
                 <Grid.Row>
                     <Grid.Column computer={6} tablet={12} mobile={16}>
-                        <Segment fluid raised style={{padding: 20}}>
+                        <Segment raised style={{padding: 20}}>
                             <Form>
                                 <Form.Field control={Input} value={title}
                                             onChange={e => setTitle(e.target.value)}
