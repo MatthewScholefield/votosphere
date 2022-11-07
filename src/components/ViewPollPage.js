@@ -77,7 +77,7 @@ export default function ViewPollPage() {
                 </div>
                 <ReactMarkdown>{pollInfo.extraDescriptions[field]}</ReactMarkdown>
                 <Progress progress='value' key={field} style={{margin: '0.5em 0 1.5em'}}
-                                value={counts[field] || 0} total={maxCount}
+                                value={(counts[field] || 0).toFixed(2)} total={maxCount}
                                 color={colors[i % colors.length]}/>
             </>
         })}
