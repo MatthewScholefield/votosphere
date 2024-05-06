@@ -16,7 +16,6 @@ jobs:
     - name: Build static bundle
       run: |
         npm run build
-        echo "votosphere.us.to" > build/CNAME
         touch build/.nojekyll
     - name: Push built artifacts
       uses: s0/git-publish-subdir-action@develop
