@@ -2,7 +2,7 @@
   "name": "votosphere",
   "version": "0.1.0",
   "private": true,
-  "homepage": "",
+  "homepage": "/votosphere",
   "dependencies": {
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-syntax-flow": "^7.14.5",
