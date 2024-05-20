@@ -4,7 +4,7 @@ import './App.css';
 import {getJson, updateJson} from '../api';
 import 'semantic-ui-css/semantic.min.css';
 import {Button, Container, Form, Grid, Header, Popup, Segment} from 'semantic-ui-react';
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation, useNavigate, Link} from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
 import Cookies from "universal-cookie";
 import {shuffle} from "../utils";
@@ -127,6 +127,13 @@ export default function PollPage() {
                             </Form>
                         </Segment>
                     </Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                    <Link to={`/viewPoll?id=${id}`}>
+                        <Button>
+                            View Results
+                        </Button>
+                    </Link>
                 </Grid.Row>
             </Grid>
         </Container>
